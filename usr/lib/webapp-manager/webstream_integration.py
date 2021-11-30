@@ -76,15 +76,15 @@ class storeWindow:
 
         # A dictionary for the category tabs.
         self.tab_category = {}
-        self.tab_category[1] = "audio"
-        self.tab_category[2] = "utility"
-        self.tab_category[3] = "development"
-        self.tab_category[4] = "education"
-        self.tab_category[5] = "games"
-        self.tab_category[6] = "graphics"
-        self.tab_category[7] = "internet"
-        self.tab_category[8] = "productivity"
-        self.tab_category[9] = "video"
+        self.tab_category[1] = "Audio"
+        self.tab_category[2] = "Utility"
+        self.tab_category[3] = "Development"
+        self.tab_category[4] = "Education"
+        self.tab_category[5] = "Game"
+        self.tab_category[6] = "Graphics"
+        self.tab_category[7] = "Network"
+        self.tab_category[8] = "Office"
+        self.tab_category[9] = "Video"
 
         self.gui.get_object("tabs").connect("switch-page", self.tab_switched)
 
@@ -93,7 +93,7 @@ class storeWindow:
             child.destroy()
 
         if page_id == 0:
-            for app in self.app_store.get_apps_by_tag("featured"):
+            for app in self.app_store.get_apps_by_tag("Featured"):
                 page.add(ListboxApp(app))
         else:
             for app in self.app_store.get_apps_by_category(self.tab_category[page_id]):
