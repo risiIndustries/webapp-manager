@@ -8,7 +8,7 @@ import shutil
 import string
 import threading
 import traceback
-from gi.repository import GObject
+from gi.repository import GObject, Gio
 from random import choice
 
 # Used as a decorator to run things in the background

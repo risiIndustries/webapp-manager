@@ -1,11 +1,13 @@
 import webstream
 import gi
+import requests
 
 gi.require_version("Gtk", "3.0")
 
-from gi.repository import Gtk, Pango
+from gi.repository import Gtk, Pango, Gio, GdkPixbuf
 
 webstream_url = "https://raw.githubusercontent.com/risiOS/risi-webstream-repo/main/repo.yml"
+
 
 class ListboxApp(Gtk.Box):
     def __init__(self, app):
@@ -15,6 +17,14 @@ class ListboxApp(Gtk.Box):
         image = Gtk.Image.new_from_icon_name(
             "applications-internet",
             Gtk.IconSize.DIALOG
+        )
+
+        pixbuf = pixbuf_from_url(
+            "https://raw.githubusercontent.com/risiOS/risi-webstream-repo/main/icons/codepen.png"
+        )
+        pixbuf = pixbuf.scale_simple(64, 64, GdkPixbuf.InterpType.BILINEAR)
+        image.set_from_pixbuf(
+            pixbuf
         )
 
         nameAndTagBox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
@@ -54,6 +64,7 @@ class ListboxApp(Gtk.Box):
         self.add(nameAndDescriptionBox)
         self.add(buttonBox)
         self.set_halign(Gtk.Align.FILL)
+
 
 class storeWindow:
     def __init__(self, mainWindow):
@@ -102,21 +113,28 @@ class storeWindow:
 
         self.previous_tab = page_id
 
-    def install_button(self, button, app):
-        self.name_entry.set_text(app.name)
-        self.url_entry.set_text(app.url)
-        self.icon_chooser.set_icon("webapp-manager")
-        self.category_combo.set_active(0)
-        self.browser_combo.set_active(0)
-        self.isolated_switch.set_active(True)
-        self.navbar_switch.set_active(False)
-        self.privatewindow_switch.set_active(False)
-        for widget in self.add_specific_widgets:
-            widget.show()
-        self.show_hide_browser_widgets()
-        self.stack.set_visible_child_name("add_page")
-        self.headerbar.set_subtitle(_("Add a New Web App"))
-        self.edit_mode = False
-        self.toggle_ok_sensitivity()
-        self.name_entry.grab_focus()
-        self.stack.set_visible_child_name("add_page")
+    # def install_button(self, button, app):
+    #     self.name_entry.set_text(app.name)
+    #     self.url_entry.set_text(app.url)
+    #     self.icon_chooser.set_icon("webapp-manager")
+    #     self.category_combo.set_active(0)
+    #     self.browser_combo.set_active(0)
+    #     self.isolated_switch.set_active(True)
+    #     self.navbar_switch.set_active(False)
+    #     self.privatewindow_switch.set_active(False)
+    #     for widget in self.add_specific_widgets:
+    #         widget.show()
+    #     self.show_hide_browser_widgets()
+    #     self.stack.set_visible_child_name("add_page")
+    #     self.headerbar.set_subtitle(_("Add a New Web App"))
+    #     self.edit_mode = False
+    #     self.toggle_ok_sensitivity()
+    #     self.name_entry.grab_focus()
+    #     self.stack.set_visible_child_name("add_page")
+
+
+def pixbuf_from_url(url):
+    image = requests.get(url)
+    return GdkPixbuf.Pixbuf.new_from_stream(
+        Gio.MemoryInputStream.new_from_data(image.content, None)
+    )

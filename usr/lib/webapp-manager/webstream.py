@@ -26,9 +26,9 @@ class Storage:
                 item,
                 data[item]["name"],
                 data[item]["url"],
+                data[item]["homepage"],
                 data[item]["description"],
                 data[item]["category"],
-                data[item]["price"],
                 data[item]["tags"]
             ))
         return output
@@ -42,7 +42,14 @@ class Storage:
     def get_apps_by_category(self, category):
         apps = []
         for app in self.apps:
-            if app.category == category:
+            if category in app.categories:
+                apps.append(app)
+        return apps
+    
+    def get_apps_by_tag(self, tag):
+        apps = []
+        for app in self.apps:
+            if tag in app.tags:
                 apps.append(app)
         return apps
 
@@ -83,11 +90,11 @@ class Storage:
         return False
 
 class WebApp:
-    def __init__(self, appid, name, url, description, category, price, tags):
+    def __init__(self, appid, name, url, homepage, description, categories, tags):
         self.appid = appid
         self.name = name
         self.url = url
+        self.homepage = homepage
         self.description = description
-        self.category = category
-        self.price = price
+        self.categories = categories
         self.tags = tags
