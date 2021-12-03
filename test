@@ -1,5 +1,7 @@
 #!/bin/bash
+wget https://raw.githubusercontent.com/risiOS/webstream/main/__main__.py
 sudo rm -rf /usr/lib/webapp-manager
 sudo rm -rf /usr/share/webapp-manager
 sudo cp -R usr /
+sudo mv __main__.py /usr/lib/webapp-manager/webstream.py
 webapp-manager

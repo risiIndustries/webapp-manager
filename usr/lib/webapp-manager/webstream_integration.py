@@ -8,9 +8,11 @@ from gi.repository import Gtk, Pango
 webstream_url = "https://raw.githubusercontent.com/risiOS/risi-webstream-repo/main/repo.yml"
 
 class ListboxApp(Gtk.Box):
-    def __init__(self, app):
+    def __init__(self, app, mainWindow, storeWindow):
         Gtk.Box.__init__(self, orientation=Gtk.Orientation.HORIZONTAL)
         self.app = app
+        self.mainWindow = mainWindow
+        self.storeWindow = storeWindow
 
         image = Gtk.Image.new_from_icon_name(
             "applications-internet",
@@ -41,11 +43,12 @@ class ListboxApp(Gtk.Box):
         homepageButton = Gtk.Button.new_from_icon_name(
             "insert-link-symbolic", Gtk.IconSize.BUTTON
         )
-
         installButton.set_relief(Gtk.ReliefStyle.NONE)
         homepageButton.set_relief(Gtk.ReliefStyle.NONE)
         installButton.get_style_context().add_class("circular")
         homepageButton.get_style_context().add_class("circular")
+        installButton.connect("clicked", self.install_button)
+
         buttonBox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         buttonBox.add(installButton)
         buttonBox.add(homepageButton)
@@ -55,8 +58,15 @@ class ListboxApp(Gtk.Box):
         self.add(buttonBox)
         self.set_halign(Gtk.Align.FILL)
 
+    def install_button(self, button):
+        self.mainWindow.on_add_button(button)
+        self.mainWindow.name_entry.set_text(self.app.name)
+        self.mainWindow.url_entry.set_text(self.app.url)
+        self.storeWindow.window.destroy()
+
 class storeWindow:
     def __init__(self, mainWindow):
+        self.mainWindow = mainWindow
         self.previous_tab = 0
         # Gtk.ApplicationWindow.__init__(self)
 
@@ -76,14 +86,14 @@ class storeWindow:
 
         # A dictionary for the category tabs.
         self.tab_category = {}
-        self.tab_category[1] = "audio"
-        self.tab_category[2] = "utility"
-        self.tab_category[3] = "development"
-        self.tab_category[4] = "education"
-        self.tab_category[5] = "games"
-        self.tab_category[6] = "graphics"
-        self.tab_category[7] = "internet"
-        self.tab_category[8] = "productivity"
+        self.tab_category[1] = "Audio"
+        self.tab_category[2] = "Utility"
+        self.tab_category[3] = "Development"
+        self.tab_category[4] = "Education"
+        self.tab_category[5] = "Game"
+        self.tab_category[6] = "Graphics"
+        self.tab_category[7] = "Network"
+        self.tab_category[8] = "Office"
         self.tab_category[9] = "video"
 
         self.gui.get_object("tabs").connect("switch-page", self.tab_switched)
@@ -94,29 +104,11 @@ class storeWindow:
 
         if page_id == 0:
             for app in self.app_store.get_apps_by_tag("featured"):
-                page.add(ListboxApp(app))
+                page.add(ListboxApp(app, self.mainWindow, self))
         else:
             for app in self.app_store.get_apps_by_category(self.tab_category[page_id]):
-                page.add(ListboxApp(app))
+                page.add(ListboxApp(app, self.mainWindow, self))
         page.show_all()
 
         self.previous_tab = page_id
 
-    def install_button(self, button, app):
-        self.name_entry.set_text(app.name)
-        self.url_entry.set_text(app.url)
-        self.icon_chooser.set_icon("webapp-manager")
-        self.category_combo.set_active(0)
-        self.browser_combo.set_active(0)
-        self.isolated_switch.set_active(True)
-        self.navbar_switch.set_active(False)
-        self.privatewindow_switch.set_active(False)
-        for widget in self.add_specific_widgets:
-            widget.show()
-        self.show_hide_browser_widgets()
-        self.stack.set_visible_child_name("add_page")
-        self.headerbar.set_subtitle(_("Add a New Web App"))
-        self.edit_mode = False
-        self.toggle_ok_sensitivity()
-        self.name_entry.grab_focus()
-        self.stack.set_visible_child_name("add_page")
