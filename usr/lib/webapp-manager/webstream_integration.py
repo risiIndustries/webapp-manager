@@ -24,6 +24,7 @@ class ListboxApp(Gtk.Box):
         pixbuf = pixbuf_from_url(
             "https://raw.githubusercontent.com/risiOS/risi-webstream-repo/main/icons/codepen.png"
         )
+
         pixbuf = pixbuf.scale_simple(64, 64, GdkPixbuf.InterpType.BILINEAR)
         image.set_from_pixbuf(
             pixbuf
@@ -74,6 +75,7 @@ class ListboxApp(Gtk.Box):
         self.mainWindow.url_entry.set_text(self.app.url)
         self.storeWindow.window.destroy()
 
+
 class storeWindow:
     def __init__(self, mainWindow):
         self.mainWindow = mainWindow
@@ -104,7 +106,7 @@ class storeWindow:
         self.tab_category[6] = "Graphics"
         self.tab_category[7] = "Network"
         self.tab_category[8] = "Office"
-        self.tab_category[9] = "video"
+        self.tab_category[9] = "Video"
 
         self.gui.get_object("tabs").connect("switch-page", self.tab_switched)
 
@@ -113,15 +115,14 @@ class storeWindow:
             child.destroy()
 
         if page_id == 0:
-            for app in self.app_store.get_apps_by_tag("featured"):
-                page.add(ListboxApp(app, self.mainWindow, self))
+            for app in self.app_store.get_apps_by_tag("Featured"):
+                page.add(ListboxApp(app))
         else:
             for app in self.app_store.get_apps_by_category(self.tab_category[page_id]):
                 page.add(ListboxApp(app, self.mainWindow, self))
         page.show_all()
 
         self.previous_tab = page_id
-
 
 def pixbuf_from_url(url):
     image = requests.get(url)
