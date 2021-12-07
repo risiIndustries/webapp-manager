@@ -170,15 +170,15 @@ class WebAppManagerWindow():
 
         # Combox box
         category_model = Gtk.ListStore(str, str) # CATEGORY_ID, CATEGORY_NAME
-        category_model.append(["Audio",_("Audio")])
-        # category_model.append(["WebApps",_("Web")])
-        category_model.append(["Utility",_("Accessories")])
-        category_model.append(["Development",_("Development")])
-        category_model.append(["Education",_("Education")])
-        category_model.append(["Game",_("Games")])
-        category_model.append(["Graphics",_("Graphics")])
-        category_model.append(["Office",_("Office")])
-        category_model.append(["Video",_("Video")])
+        category_model.append(["Audio", _("Audio")])
+        category_model.append(["Utility", _("Accessories")])
+        category_model.append(["Development", _("Development")])
+        category_model.append(["Education", _("Education")])
+        category_model.append(["Game", _("Games")])
+        category_model.append(["Graphics", _("Graphics")])
+        category_model.append(["Network", _("Internet")])
+        category_model.append(["Office", _("Office")])
+        category_model.append(["Video", _("Video")])
 
         self.category_combo = self.builder.get_object("category_combo")
         renderer = Gtk.CellRendererText()
@@ -325,7 +325,7 @@ class WebAppManagerWindow():
             self.load_webapps()
 
     def on_store_button(self, widget):
-        store = webstream_integration.storeWindow(self)
+        store = webstream_integration.StoreWindow(self)
         self.application.add_window(store.window)
         store.window.show_all()
         window_size = self.window.get_size()
