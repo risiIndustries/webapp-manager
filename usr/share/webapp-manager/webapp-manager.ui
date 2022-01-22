@@ -463,6 +463,7 @@
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="halign">center</property>
+                    <property name="valign">center</property>
                   </object>
                   <packing>
                     <property name="left-attach">1</property>
@@ -474,8 +475,8 @@
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <property name="halign">end</property>
-                    <property name="label" translatable="yes">Private/Incognito Window:</property>
-                    <property name="wrap">True</property>
+                    <property name="label" translatable="yes">Private Window:</property>
+                    <property name="single-line-mode">True</property>
                     <property name="max-width-chars">30</property>
                   </object>
                   <packing>
