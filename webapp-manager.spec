@@ -35,7 +35,7 @@ mkdir -p %{buildroot}%{_datadir}
 cp -a usr/bin %{buildroot}%{_bindir}
 cp -a usr/lib/webapp-manager %{buildroot}%{_libdir}
 cp -a usr/share %{buildroot}%{_datadir}
-cp -a etc %{_sysconfdir}
+cp -a etc %{buildroot}%{_sysconfdir}
 
 %files
 # %license add-license-file-here
