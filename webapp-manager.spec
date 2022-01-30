@@ -5,7 +5,7 @@ Summary:        risiOS's fork of webapp-manager
 
 License:        GPL v3
 URL:            https://github.com/risiOS/webapp-manager
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/risiOS/webapp-manager/archive/refs/heads/main.tar.gz
 
 BuildArch:	noarch
 
