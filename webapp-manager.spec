@@ -5,7 +5,7 @@ Summary:        risiOS's fork of webapp-manager
 
 License:        GPL v3
 URL:            https://github.com/risiOS/webapp-manager
-Source0:        https://github.com/risiOS/webapp-manager/archive/refs/heads/main.tar.gz
+Source0:        https://github.com/risiOS/webapp-manager/archive/refs/heads/master.tar.gz
 
 BuildArch:	noarch
 
@@ -23,7 +23,7 @@ Requires:	xapps
 A fork of the Linux Mint web app manager with a store for web apps.
 
 %prep
-%autosetup -n %{name}-main.tar.gz
+%autosetup -n %{name}-master.tar.gz
 
 %build
 %install
