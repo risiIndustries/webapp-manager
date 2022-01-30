@@ -23,7 +23,7 @@ Requires:	xapps
 A fork of the Linux Mint web app manager with a store for web apps.
 
 %prep
-%autosetup
+%autosetup -n %{name}-main.tar.gz
 
 %build
 %install
