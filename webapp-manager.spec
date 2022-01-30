@@ -26,12 +26,6 @@ A fork of the Linux Mint web app manager with a store for web apps.
 %autosetup -n %{name}-master
 
 %build
-%install
-
-mkdir -p %{buildroot}%{_bindir}
-mkdir -p %{buildroot}%{_libdir}
-mkdir -p %{buildroot}%{_datadir}
-
 cp -a usr/bin %{buildroot}%{_bindir}
 cp -a usr/lib/webapp-manager %{buildroot}%{_libdir}
 cp -a usr/share %{buildroot}%{_datadir}
@@ -40,6 +34,16 @@ cp -a etc %{buildroot}%{_sysconfdir}
 %files
 # %license add-license-file-here
 # %doc add-docs-here
+%{_sysconfdir}/xdg/menus/applications-merged/webapps.menu
+%{_bindir}/webapp-manager
+%{_libdir}/webapp-manager
+%{_datadir}/applications/kde4/webapp-manager.desktop
+%{_datadir}/applications/webapp-manager.desktop
+%{_datadir}/desktop-directories/webapps-webapps.directory
+%{_datadir}/glib-2.0/schemas/org.x.webapp-manager.gschema.xml
+%{_datadir}/icons/hicolor/scalable/apps/webapp-default.svg
+%{_datadir}/icons/hicolor/scalable/apps/webapp-manager.svg
+%{_datadir}/webapp-manager
 
 %changelog
 * Tue Jul 13 2021 PizzaLovingNerd
