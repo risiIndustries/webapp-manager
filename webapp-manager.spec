@@ -1,7 +1,7 @@
-Name:           risi-tweaks
+Name:           webapp-manager
 Version:        1.1.6
 Release:        1%{?dist}
-Summary:        risiOS's Tweak Tool
+Summary:        risiOS's fork of webapp-manager
 
 License:        GPL v3
 URL:            https://github.com/risiOS/webapp-manager
