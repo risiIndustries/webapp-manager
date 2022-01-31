@@ -9,8 +9,7 @@ Source0:        https://github.com/risiOS/webapp-manager/archive/refs/heads/mast
 
 BuildArch:	noarch
 
-BuildRequires:  python
-Requires:       python
+Requires:   python
 Requires:	python3-gobject
 Requires:	python3-beautifulsoup4
 Requires:	python3-configobj
@@ -26,10 +25,13 @@ A fork of the Linux Mint web app manager with a store for web apps.
 %autosetup -n %{name}-master
 
 %build
-cp -a usr/bin %{buildroot}%{_bindir}
-cp -a usr/lib/webapp-manager %{buildroot}%{_libdir}
-cp -a usr/share %{buildroot}%{_datadir}
-cp -a etc %{buildroot}%{_sysconfdir}
+%install
+mkdir %{buildroot}%{_exec_prefix}
+
+cp -a ../usr/bin %{buildroot}%{_bindir}
+cp -a ../usr/lib/webapp-manager %{buildroot}%{_libdir}
+cp -a ../usr/share %{buildroot}%{_datadir}
+cp -a ../etc %{buildroot}%{_sysconfdir}
 
 %files
 # %license add-license-file-here
