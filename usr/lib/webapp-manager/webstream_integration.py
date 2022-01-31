@@ -148,8 +148,8 @@ class StoreWindow:
         if page_id == 0:
             self.load_featured(page)
         else:
-            for app in self.app_store.get_apps_by_category(self.tab_category[page_id]):
-                app.main_category = self.tab_category[page_id]
+            for app in self.app_store.get_apps_by_category(tab_category[page_id]):
+                app.main_category = tab_category[page_id]
                 page.add(ListboxApp(app, self.main_window))
         page.show_all()
 
