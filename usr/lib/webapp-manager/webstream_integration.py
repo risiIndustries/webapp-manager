@@ -4,7 +4,7 @@ import requests
 import tempfile
 
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk, Pango, Gio, GdkPixbuf, Gdk
+from gi.repository import Gtk, Pango, Gio, GdkPixbuf, Gdk, GLib
 
 webstream_url = "https://raw.githubusercontent.com/risiOS/risi-webstream-repo/main/repo.yml"
 icons_url = "https://raw.githubusercontent.com/risiOS/risi-webstream-repo/main/icons/{}.png"
@@ -28,9 +28,8 @@ class ListboxApp(Gtk.Box):
         self.app = app
         self.main_window = main_window
 
-        image = Gtk.Image.new_from_icon_name(
-            "applications-internet",
-            Gtk.IconSize.DIALOG
+        image = Gtk.Image.new_from_pixbuf(
+            Gtk.IconTheme().load_icon("default-webapp", 64, Gtk.IconLookupFlags.FORCE_SIZE)
         )
 
         self.pixbuf = pixbuf_from_url(
@@ -162,9 +161,12 @@ def pixbuf_from_url(url):
     except (requests.ConnectionError, requests.HTTPError, requests.RequestException) as error:
         return False
 
-    return GdkPixbuf.Pixbuf.new_from_stream(
-        Gio.MemoryInputStream.new_from_data(image.content, None)
-    )
+    try:
+        return GdkPixbuf.Pixbuf.new_from_stream(
+            Gio.MemoryInputStream.new_from_data(image.content, None)
+        )
+    except GLib.GError:
+        return False
 
 
 class Search(Gtk.ListBox):
