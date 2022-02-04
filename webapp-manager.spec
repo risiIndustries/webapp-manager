@@ -29,7 +29,7 @@ A fork of the Linux Mint web app manager with a store for web apps.
 mkdir %{buildroot}%{_exec_prefix}
 
 cp -a usr/bin %{buildroot}%{_bindir}
-cp -a usr/lib/webapp-manager %{buildroot}%{_libdir}/webapp-manager
+cp -a usr/lib %{buildroot}%{_libdir}
 cp -a usr/share %{buildroot}%{_datadir}
 cp -a etc %{buildroot}%{_sysconfdir}
 
