@@ -45,6 +45,7 @@ cp -a etc %{buildroot}%{_sysconfdir}
 %{_datadir}/glib-2.0/schemas/org.x.webapp-manager.gschema.xml
 %{_datadir}/icons/hicolor/scalable/apps/webapp-default.svg
 %{_datadir}/icons/hicolor/scalable/apps/webapp-manager.svg
+%{_datadir}/icons/hicolor/scalable/categories/applications-webapps.svg
 %{_datadir}/webapp-manager
 
 %changelog
