@@ -9,6 +9,7 @@ import shutil
 import subprocess
 import tldextract
 import warnings
+import webstream_integration
 
 # Suppress GTK deprecation warnings
 warnings.filterwarnings("ignore")
@@ -51,9 +52,7 @@ class MyApplication(Gtk.Application):
             window.window.show()
 
 class WebAppManagerWindow():
-
     def __init__(self, application):
-
         self.application = application
         self.settings = Gio.Settings(schema_id="org.x.webapp-manager")
         self.manager = WebAppManager()
@@ -61,10 +60,9 @@ class WebAppManagerWindow():
         self.icon_theme = Gtk.IconTheme.get_default()
 
         # Set the Glade file
-        gladefile = "/usr/share/webapp-manager/webapp-manager.ui"
         self.builder = Gtk.Builder()
         self.builder.set_translation_domain(APP)
-        self.builder.add_from_file(gladefile)
+        self.builder.add_from_file("/usr/share/webapp-manager/webapp-manager.ui")
         self.window = self.builder.get_object("main_window")
         self.window.set_title(_("Web Apps"))
         self.window.set_icon_name("webapp-manager")
@@ -103,6 +101,7 @@ class WebAppManagerWindow():
                                      self.privatewindow_label, self.privatewindow_switch]
 
         # Widget signals
+        self.builder.get_object("store_button").connect("clicked", self.on_store_button)
         self.add_button.connect("clicked", self.on_add_button)
         self.builder.get_object("cancel_button").connect("clicked", self.on_cancel_button)
         self.builder.get_object("cancel_favicon_button").connect("clicked", self.on_cancel_favicon_button)
@@ -170,16 +169,17 @@ class WebAppManagerWindow():
         self.treeview.connect("row-activated", self.on_webapp_activated)
 
         # Combox box
-        category_model = Gtk.ListStore(str,str) # CATEGORY_ID, CATEGORY_NAME
-        category_model.append(["Network",_("Internet")])
-        category_model.append(["WebApps",_("Web")])
-        category_model.append(["Utility",_("Accessories")])
-        category_model.append(["Game",_("Games")])
-        category_model.append(["Graphics",_("Graphics")])
-        category_model.append(["Office",_("Office")])
-        category_model.append(["AudioVideo",_("Sound & Video")])
-        category_model.append(["Development",_("Programming")])
-        category_model.append(["Education",_("Education")])
+        category_model = Gtk.ListStore(str, str) # CATEGORY_ID, CATEGORY_NAME
+        category_model.append(["Audio", _("Audio")])
+        category_model.append(["Utility", _("Accessories")])
+        category_model.append(["Development", _("Development")])
+        category_model.append(["Education", _("Education")])
+        category_model.append(["Game", _("Games")])
+        category_model.append(["Graphics", _("Graphics")])
+        category_model.append(["Network", _("Internet")])
+        category_model.append(["Office", _("Office")])
+        category_model.append(["Video", _("Video")])
+
         self.category_combo = self.builder.get_object("category_combo")
         renderer = Gtk.CellRendererText()
         self.category_combo.pack_start(renderer, True)
@@ -324,6 +324,13 @@ class WebAppManagerWindow():
             self.manager.create_webapp(name, url, icon, category, browser, isolate_profile, navbar, privatewindow)
             self.load_webapps()
 
+    def on_store_button(self, widget):
+        store = webstream_integration.StoreWindow(self)
+        self.application.add_window(store.window)
+        store.window.show_all()
+        window_size = self.window.get_size()
+        store.window.set_size_request(window_size[0], window_size[1])
+
     def on_add_button(self, widget):
         self.name_entry.set_text("")
         self.url_entry.set_text("")
@@ -359,6 +366,7 @@ class WebAppManagerWindow():
                 widget.hide()
             self.stack.set_visible_child_name("add_page")
             self.headerbar.set_subtitle(_("Edit Web App"))
+
             self.edit_mode = True
             self.toggle_ok_sensitivity()
             self.name_entry.grab_focus()

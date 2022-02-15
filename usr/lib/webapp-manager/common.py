@@ -8,7 +8,7 @@ import shutil
 import string
 import threading
 import traceback
-from gi.repository import GObject
+from gi.repository import GObject, Gio
 from random import choice
 
 # Used as a decorator to run things in the background
@@ -46,7 +46,6 @@ ICONS_DIR = os.path.join(ICE_DIR, "icons")
 BROWSER_TYPE_FIREFOX, BROWSER_TYPE_FIREFOX_FLATPAK, BROWSER_TYPE_CHROMIUM, BROWSER_TYPE_EPIPHANY, BROWSER_TYPE_FALKON = range(5)
 
 class Browser():
-
     def __init__(self, browser_type, name, exec_path, test_path):
         self.browser_type = browser_type
         self.name = name
@@ -56,7 +55,6 @@ class Browser():
 # This is a data structure representing
 # the app menu item (path, name, icon..etc.)
 class WebAppLauncher():
-
     def __init__(self, path, codename):
         self.path = path
         self.codename = codename
@@ -91,7 +89,7 @@ class WebAppLauncher():
                     continue
 
                 if "Categories=" in line:
-                    self.category = line.replace("Categories=", "").replace("GTK;", "").replace(";", "")
+                    self.category = line.replace("Categories=", "").replace("GTK;", "").replace("AudioVideo;", "").replace(";", "")
                     continue
 
                 if "X-WebApp-Browser=" in line:
@@ -218,12 +216,18 @@ class WebAppManager():
             desktop_file.write("X-MultipleArgs=false\n")
             desktop_file.write("Type=Application\n")
             desktop_file.write("Icon=%s\n" % icon)
-            desktop_file.write("Categories=GTK;%s;\n" % category)
+
+            if category == "Audio" or category == "Video":
+                desktop_file.write("Categories=GTK;AudioVideo;%s;\n" % category)
+            else:
+                desktop_file.write("Categories=GTK;%s;\n" % category)
+
             desktop_file.write("MimeType=text/html;text/xml;application/xhtml_xml;\n")
             desktop_file.write("StartupWMClass=WebApp-%s\n" % codename)
             desktop_file.write("StartupNotify=true\n")
             desktop_file.write("X-WebApp-Browser=%s\n" % browser.name)
             desktop_file.write("X-WebApp-URL=%s\n" % url)
+
             if isolate_profile:
                 desktop_file.write("X-WebApp-Isolated=true\n")
             else:
@@ -243,7 +247,11 @@ class WebAppManager():
         config.set("Desktop Entry", "Name", name)
         config.set("Desktop Entry", "Icon", icon)
         config.set("Desktop Entry", "Comment", _("Web App"))
-        config.set("Desktop Entry", "Categories", "GTK;%s;" % category)
+
+        if category == "Audio" or category == "Video":
+            config.set("Desktop Entry", "Categories", "GTK;AudioVideo;%s;" % category)
+        else:
+            config.set("Desktop Entry", "Categories", "GTK;%s;" % category)
 
         try:
             # This will raise an exception on legacy apps which
