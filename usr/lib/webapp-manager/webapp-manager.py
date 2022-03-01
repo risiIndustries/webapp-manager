@@ -3,12 +3,12 @@ import gettext
 import gi
 import locale
 import os
-import re
 import setproctitle
 import shutil
 import subprocess
 import tldextract
 import warnings
+import webbrowser
 import webstream_integration
 
 # Suppress GTK deprecation warnings
@@ -17,10 +17,11 @@ warnings.filterwarnings("ignore")
 gi.require_version("Gtk", "3.0")
 gi.require_version('XApp', '1.0')
 from gi.repository import Gtk, Gdk, Gio, XApp, GdkPixbuf, GLib
-
 from common import _async, idle, WebAppManager, Browser, download_favicon, ICONS_DIR, BROWSER_TYPE_FIREFOX
 
 setproctitle.setproctitle("webapp-manager")
+
+REPORT_URL = "https://github.com/risiOS/web-redirect/issues/new?assignees=&labels=&template=report-website.md&title=%5BREPORT%5D"
 
 # i18n
 APP = 'webapp-manager'
@@ -72,8 +73,13 @@ class WebAppManagerWindow():
         self.icon_chooser.set_icon("webapp-manager")
         self.icon_chooser.show()
 
+        # Variables for store:
+        self.reportable_app = False
+        self.drm_app = False
+
         # Create variables to quickly access dynamic widgets
         self.headerbar = self.builder.get_object("headerbar")
+        self.report_button = self.builder.get_object("report_button")
         self.favicon_button = self.builder.get_object("favicon_button")
         self.add_button = self.builder.get_object("add_button")
         self.remove_button = self.builder.get_object("remove_button")
@@ -109,6 +115,7 @@ class WebAppManagerWindow():
         self.edit_button.connect("clicked", self.on_edit_button)
         self.run_button.connect("clicked", self.on_run_button)
         self.ok_button.connect("clicked", self.on_ok_button)
+        self.report_button.connect("clicked", lambda button: webbrowser.open(REPORT_URL))
         self.favicon_button.connect("clicked", self.on_favicon_button)
         self.name_entry.connect("changed", self.on_name_entry)
         self.url_entry.connect("changed", self.on_url_entry)
@@ -392,7 +399,7 @@ class WebAppManagerWindow():
         if url == "":
             return ""
         if not "://" in url:
-            url = "http://%s" % url
+            url = "https://%s" % url
         return url
 
     @_async
@@ -458,6 +465,10 @@ class WebAppManagerWindow():
         self.toggle_ok_sensitivity()
 
     def on_url_entry(self, widget):
+        self.report_button.set_visible(
+            self.get_url().startswith("http://redirect.risi.io/?url=") or
+            self.get_url().startswith("https://redirect.risi.io/?url=")
+        )
         if self.get_url() != "":
             self.favicon_button.set_sensitive(True)
         else:

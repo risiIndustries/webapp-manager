@@ -96,7 +96,7 @@ class ListboxApp(Gtk.Box):
 
         self.main_window.on_add_button(button)
         self.main_window.name_entry.set_text(self.app.name)
-        self.main_window.url_entry.set_text(self.app.url)
+        self.main_window.url_entry.set_text(f"https://redirect.risi.io/?url={self.app.url}")
         self.main_window.category_combo.set_active(
             list(
                 tab_category.values()
@@ -195,6 +195,3 @@ class Search(Gtk.ListBox):
     def reset(self):
         for child in self.get_children():
             child.destroy()
-
-
-    # def add(self):
