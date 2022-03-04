@@ -206,9 +206,9 @@ class WebAppManagerWindow():
         self.browser_combo.set_model(browser_model)
         self.browser_combo.set_active(0) # Select 1st browser
         if num_browsers == 0:
-        	print ("No supported browsers were detected.")
-        	self.add_button.set_sensitive(False)
-        	self.add_button.set_tooltip_text(_("No supported browsers were detected."))
+            print ("No supported browsers were detected.")
+            self.add_button.set_sensitive(False)
+            self.add_button.set_tooltip_text(_("No supported browsers were detected."))
         if (num_browsers < 2):
             self.browser_label.hide()
             self.browser_combo.hide()
@@ -402,6 +402,21 @@ class WebAppManagerWindow():
             url = "https://%s" % url
         return url
 
+    def get_url(self):
+        url = self.url_entry.get_text().strip().replace(
+            "https://redirect.risi.io/?url=", ""
+        ).replace(
+            "http://redirect.risi.io/?url=", ""
+        ).replace(
+            "redirect.risi.io/?url=", ""
+        )
+
+        if url == "":
+            return ""
+        if not "://" in url:
+            url = "https://%s" % url
+        return url
+
     @_async
     def download_icons(self, url):
         images = download_favicon(url)
@@ -466,8 +481,9 @@ class WebAppManagerWindow():
 
     def on_url_entry(self, widget):
         self.report_button.set_visible(
-            self.get_url().startswith("http://redirect.risi.io/?url=") or
-            self.get_url().startswith("https://redirect.risi.io/?url=")
+            widget.get_text().startswith("https://redirect.risi.io/?url=") or
+            widget.get_text().startswith("https://redirect.risi.io/?url=") or
+            widget.get_text().startswith("redirect.risi.io/?url=")
         )
         if self.get_url() != "":
             self.favicon_button.set_sensitive(True)
