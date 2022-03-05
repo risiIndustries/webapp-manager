@@ -27,9 +27,9 @@ A fork of the Linux Mint web app manager with a store for web apps.
 
 %build
 %install
-mkdir %{buildroot}%{_exec_prefix}
-mkdir %{buildroot}%{python3_sitelib}
-mkdir %{buildroot}%{python3_sitelib}/site-packages/
+mkdir -p %{buildroot}%{_exec_prefix}
+mkdir -p %{buildroot}%{python3_sitelib}
+mkdir -p %{buildroot}%{python3_sitelib}/site-packages/
 
 cp -a usr/bin %{buildroot}%{_bindir}
 cp -a usr/lib %{buildroot}%{_libdir}
