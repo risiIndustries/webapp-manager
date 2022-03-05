@@ -6,7 +6,7 @@ Summary:        risiOS's fork of webapp-manager
 License:        GPL v3
 URL:            https://github.com/risiOS/webapp-manager
 Source0:        https://github.com/risiOS/webapp-manager/archive/refs/heads/master.tar.gz
-Source1:		https://raw.githubusercontent.com/risiOS/webstream/main/__main__.py
+Source1:        https://raw.githubusercontent.com/risiOS/webstream/main/__main__.py
 
 BuildArch:	noarch
 BuildRequires:  python3-devel
@@ -35,7 +35,7 @@ cp -a usr/share %{buildroot}%{_datadir}
 cp -a etc %{buildroot}%{_sysconfdir}
 
 # webstream
-cp -a %{Source1} %{buildroot}%{python3_sitelib}/webstream.py
+cp -a %{SOURCE1} %{buildroot}%{python3_sitelib}/webstream.py
 
 %files
 # %license add-license-file-here
