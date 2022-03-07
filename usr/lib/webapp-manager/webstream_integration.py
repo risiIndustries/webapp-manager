@@ -1,3 +1,6 @@
+import threading
+import time
+
 import webstream
 import gi
 import requests
@@ -108,6 +111,8 @@ class StoreWindow:
     def __init__(self, main_window):
         self.main_window = main_window
         self.previous_tab = 0
+        self.stop_event = threading.Event()
+        self.thread = threading.Thread()
 
         # Glade file
         self.gui = Gtk.Builder()
@@ -136,18 +141,42 @@ class StoreWindow:
             page.add(ListboxApp(app, self.main_window))
 
     def tab_switched(self, notebook, page, page_id):
-        for child in notebook.get_nth_page(self.previous_tab):
+        for child in notebook.get_nth_page(self.previous_tab).get_children()[0].get_children()[0]:
             child.destroy()
-
-        if page_id == 0:
-            self.load_featured(page)
-        else:
-            for app in self.app_store.get_apps_by_category(tab_category[page_id]):
-                app.main_category = tab_category[page_id]
-                page.add(ListboxApp(app, self.main_window))
-        page.show_all()
+        for thr in threading.enumerate():
+            self.thread.join()
+        self.stop_event.clear()
 
         self.previous_tab = page_id
+        if page_id == 0:
+            self.load_featured(self.gui.get_object("featured_list"))
+        else:
+            self.thread = threading.Thread(target=self.add_apps_thread, args=[page_id, page])
+            self.thread.daemon = True
+            self.thread.start()
+        #     for app in self.app_store.get_apps_by_category(tab_category[page_id]):
+        #         app.main_category = tab_category[page_id]
+        #         page.get_children()[0].get_children()[0].add(ListboxApp(app, self.main_window))
+        # page.show_all()
+
+    def add_apps_thread(self, page_id, page):
+        for app in self.app_store.get_apps_by_category(tab_category[page_id]):
+            if self.stop_event.is_set():
+                self.stop_event.clear()
+                break
+
+            app.main_category = tab_category[page_id]
+            time.sleep(0.001)
+            GLib.idle_add(
+                self.add_app, page.get_children()[0].get_children()[0], app
+            )
+
+    def add_app(self, page, app):
+        if not self.stop_event.is_set():
+            app_widget = ListboxApp(app, self.main_window)
+            if not self.stop_event.is_set():
+                page.add(app_widget)
+                app_widget.show_all()
 
 
 def pixbuf_from_url(url):
