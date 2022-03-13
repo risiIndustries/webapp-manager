@@ -32,7 +32,7 @@ mkdir -p %{buildroot}%{python3_sitelib}
 mkdir -p %{buildroot}%{python3_sitelib}/site-packages/
 
 cp -a usr/bin %{buildroot}%{_bindir}
-cp -a usr/lib %{buildroot}%{_libdir}
+cp -a usr/lib64 %{buildroot}%{_libdir}
 cp -a usr/share %{buildroot}%{_datadir}
 cp -a etc %{buildroot}%{_sysconfdir}
 
