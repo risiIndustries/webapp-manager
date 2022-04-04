@@ -1,4 +1,4 @@
-import threading
+import os
 import time
 
 import webstream
@@ -30,20 +30,10 @@ class ListboxApp(Gtk.Box):
         Gtk.Box.__init__(self, orientation=Gtk.Orientation.HORIZONTAL)
         self.app = app
         self.main_window = main_window
+        self.cancellable = Gio.Cancellable()
+        self.pixbuf = Gtk.IconTheme().load_icon("webapp-default", 64, Gtk.IconLookupFlags.FORCE_SIZE)
 
-        image = Gtk.Image.new_from_pixbuf(
-            Gtk.IconTheme().load_icon("default-webapp", 64, Gtk.IconLookupFlags.FORCE_SIZE)
-        )
-
-        self.pixbuf = pixbuf_from_url(
-            icons_url.format(app.appid)
-        )
-
-        if not self.pixbuf:
-            self.pixbuf = Gtk.IconTheme().load_icon("default-webapp", 64, Gtk.IconLookupFlags.FORCE_SIZE)
-        else:
-            self.pixbuf = self.pixbuf.scale_simple(64, 64, GdkPixbuf.InterpType.BILINEAR)
-        image.set_from_pixbuf(
+        self.image = Gtk.Image.new_from_pixbuf(
             self.pixbuf
         )
 
@@ -79,10 +69,29 @@ class ListboxApp(Gtk.Box):
         buttonBox.add(installButton)
         buttonBox.add(homepageButton)
 
-        self.add(image)
+        self.add(self.image)
         self.add(nameAndDescriptionBox)
         self.add(buttonBox)
         self.set_halign(Gtk.Align.FILL)
+
+        remote_pixbuf = Gio.File.new_for_uri(icons_url.format(app.appid))
+        remote_pixbuf.load_contents_async(self.cancellable, self.download_icon_async)
+
+    def download_icon_async(self, file, result, data=None):
+        try:
+            success, contents, etag = file.load_contents_finish(result)
+            image_file = open(tempfile.mkstemp(suffix=".png")[1], "wb+")
+            image_file.write(contents)
+
+            self.pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(image_file.name, 64, 64, True)
+            self.image.set_from_pixbuf(self.pixbuf)
+        except GLib.Error:
+            self.pixbuf = Gtk.IconTheme().load_icon(
+                "webapp-default", 64, Gtk.IconLookupFlags.FORCE_SIZE)
+            self.image = Gtk.Image.new_from_pixbuf(self.pixbuf)
+        else:
+            os.remove(image_file.name)
+
 
     def install_button(self, button):
         # Generate icon
@@ -111,8 +120,6 @@ class StoreWindow:
     def __init__(self, main_window):
         self.main_window = main_window
         self.previous_tab = 0
-        self.stop_event = threading.Event()
-        self.thread = threading.Thread()
 
         # Glade file
         self.gui = Gtk.Builder()
@@ -129,7 +136,9 @@ class StoreWindow:
         self.app_store.load_from_url(webstream_url)
 
         self.gui.get_object("tabs").connect("switch-page", self.tab_switched)
-        self.load_featured(self.gui.get_object("featured_list"))
+        featured = self.load_featured(self.gui.get_object("featured_list"))
+        check_no_apps(featured)
+        featured.show_all()
 
         search_page = Search(self.app_store, self.main_window)
         self.gui.get_object("searchpage").add(search_page)
@@ -139,58 +148,29 @@ class StoreWindow:
         for app in self.app_store.get_apps_by_tag("Featured"):
             app.main_category = app.categories[0]
             page.add(ListboxApp(app, self.main_window))
+        return page
 
     def tab_switched(self, notebook, page, page_id):
         for child in notebook.get_nth_page(self.previous_tab).get_children()[0].get_children()[0]:
+            if not isinstance(child.get_child(), Gtk.Label):
+                child.get_child().cancellable.cancel()
             child.destroy()
-        for thr in threading.enumerate():
-            self.thread.join()
-        self.stop_event.clear()
 
         self.previous_tab = page_id
         if page_id == 0:
-            self.load_featured(self.gui.get_object("featured_list"))
+            listbox = self.load_featured(self.gui.get_object("featured_list"))
         else:
-            self.thread = threading.Thread(target=self.add_apps_thread, args=[page_id, page])
-            self.thread.daemon = True
-            self.thread.start()
-        #     for app in self.app_store.get_apps_by_category(tab_category[page_id]):
-        #         app.main_category = tab_category[page_id]
-        #         page.get_children()[0].get_children()[0].add(ListboxApp(app, self.main_window))
-        # page.show_all()
-
-    def add_apps_thread(self, page_id, page):
-        for app in self.app_store.get_apps_by_category(tab_category[page_id]):
-            if self.stop_event.is_set():
-                self.stop_event.clear()
-                break
-
-            app.main_category = tab_category[page_id]
-            time.sleep(0.001)
-            GLib.idle_add(
-                self.add_app, page.get_children()[0].get_children()[0], app
-            )
+            listbox = page.get_children()[0].get_children()[0]
+            for app in self.app_store.get_apps_by_category(tab_category[page_id]):
+                app.main_category = tab_category[page_id]
+                listbox.add(ListboxApp(app, self.main_window))
+        check_no_apps(listbox)
+        page.show_all()
 
     def add_app(self, page, app):
-        if not self.stop_event.is_set():
-            app_widget = ListboxApp(app, self.main_window)
-            if not self.stop_event.is_set():
-                page.add(app_widget)
-                app_widget.show_all()
-
-
-def pixbuf_from_url(url):
-    try:
-        image = requests.get(url)
-    except (requests.ConnectionError, requests.HTTPError, requests.RequestException) as error:
-        return False
-
-    try:
-        return GdkPixbuf.Pixbuf.new_from_stream(
-            Gio.MemoryInputStream.new_from_data(image.content, None)
-        )
-    except GLib.GError:
-        return False
+        app_widget = ListboxApp(app, self.main_window)
+        page.add(app_widget)
+        app_widget.show_all()
 
 
 class Search(Gtk.ListBox):
@@ -200,6 +180,12 @@ class Search(Gtk.ListBox):
         self.main_window = main_window
         self.set_valign(Gtk.Align.FILL)
         self.set_vexpand(True)
+        search_label = Gtk.Label()
+        search_label.set_margin_top(10)
+        search_label.set_markup("<b>Please enter search query</b>")
+        search_label.set_margin_bottom(10)
+        self.add(search_label)
+        self.show_all()
 
     def search(self, query):
         self.reset()
@@ -207,6 +193,7 @@ class Search(Gtk.ListBox):
             for app in self.app_store.get_apps_by_search(query):
                 app.main_category = app.categories[0]
                 self.add(ListboxApp(app, self.main_window))
+            check_no_apps(self, "No apps found")
         else:
             search_label = Gtk.Label()
             search_label.set_margin_top(10)
@@ -219,3 +206,16 @@ class Search(Gtk.ListBox):
     def reset(self):
         for child in self.get_children():
             child.destroy()
+
+
+def check_no_apps(listbox, *args):
+    if not listbox.get_children():
+        if args:
+            text = args[0]
+        else:
+            text = "No apps found, check network settings."
+        label = Gtk.Label(label=text)
+        label.set_margin_top(10)
+        label.set_margin_bottom(10)
+        label.set_markup(f"<b>{text}</b>")
+        listbox.add(label)
