@@ -31,8 +31,8 @@ class ListboxApp(Gtk.Box):
         self.app = app
         self.main_window = main_window
 
-        image = Gtk.Image.new_from_pixbuf(
-            Gtk.IconTheme().load_icon("default-webapp", 64, Gtk.IconLookupFlags.FORCE_SIZE)
+        image = Gtk.Image.new_from_icon_name(
+            "webapp-default", 64
         )
 
         self.pixbuf = pixbuf_from_url(
@@ -40,12 +40,13 @@ class ListboxApp(Gtk.Box):
         )
 
         if not self.pixbuf:
-            self.pixbuf = Gtk.IconTheme().load_icon("default-webapp", 64, Gtk.IconLookupFlags.FORCE_SIZE)
+            self.pixbuf = None
         else:
             self.pixbuf = self.pixbuf.scale_simple(64, 64, GdkPixbuf.InterpType.BILINEAR)
-        image.set_from_pixbuf(
-            self.pixbuf
-        )
+        if self.pixbuf:
+            image.set_from_pixbuf(
+                self.pixbuf
+            )
 
         nameAndTagBox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         mainLabel = Gtk.Label()
