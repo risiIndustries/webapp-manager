@@ -1,2 +1,2 @@
 #!/bin/sh
-/usr/lib/webapp-manager/webapp-manager.py &
+/usr/lib64/webapp-manager/webapp-manager.py &

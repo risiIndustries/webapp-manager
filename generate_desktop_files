@@ -22,7 +22,7 @@ StartupNotify=false
 NotShowIn=KDE;
 """
 
-additionalfiles.generate(DOMAIN, PATH, "usr/share/applications/webapp-manager.desktop", prefix, _("Web Apps"), _("Run websites as if they were apps"), suffix)
+additionalfiles.generate(DOMAIN, PATH, "usr/share/applications/org.x.org.x.webapp-manager.desktop", prefix, _("Web Apps"), _("Run websites as if they were apps"), suffix)
 
 prefix = "[Desktop Entry]\n"
 
@@ -36,7 +36,7 @@ X-KDE-StartupNotify=false
 OnlyShowIn=KDE;
 """
 
-additionalfiles.generate(DOMAIN, PATH, "usr/share/applications/kde4/webapp-manager.desktop", prefix, _("Web Apps"), _("Run websites as if they were apps"), suffix, genericName=_("Web Apps"))
+additionalfiles.generate(DOMAIN, PATH, "usr/share/applications/kde4/org.x.org.x.webapp-manager.desktop", prefix, _("Web Apps"), _("Run websites as if they were apps"), suffix, genericName=_("Web Apps"))
 
 prefix = """[Desktop Entry]
 Type=Directory

@@ -1,6 +1,6 @@
 Name:           webapp-manager
 Version:        1.1.9
-Release:        1%{?dist}
+Release:        4%{?dist}
 Summary:        risiOS's fork of webapp-manager
 
 License:        GPL v3
@@ -32,7 +32,7 @@ mkdir -p %{buildroot}%{python3_sitelib}
 mkdir -p %{buildroot}%{python3_sitelib}/site-packages/
 
 cp -a usr/bin %{buildroot}%{_bindir}
-cp -a usr/lib %{buildroot}%{_libdir}
+cp -a usr/lib64 %{buildroot}%{_libdir}
 cp -a usr/share %{buildroot}%{_datadir}
 cp -a etc %{buildroot}%{_sysconfdir}
 
@@ -45,8 +45,8 @@ cp -a %{SOURCE1} %{buildroot}%{python3_sitelib}/webstream.py
 %{_sysconfdir}/xdg/menus/applications-merged/webapps.menu
 %{_bindir}/webapp-manager
 %{_libdir}/webapp-manager
-%{_datadir}/applications/kde4/webapp-manager.desktop
-%{_datadir}/applications/webapp-manager.desktop
+%{_datadir}/applications/kde4/org.x.webapp-manager.desktop
+%{_datadir}/applications/org.x.webapp-manager.desktop
 %{_datadir}/desktop-directories/webapps-webapps.directory
 %{_datadir}/glib-2.0/schemas/org.x.webapp-manager.gschema.xml
 %{_datadir}/icons/hicolor/scalable/apps/webapp-default.svg
