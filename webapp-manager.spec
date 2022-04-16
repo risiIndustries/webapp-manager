@@ -1,6 +1,6 @@
 Name:           webapp-manager
 Version:        1.1.9
-Release:        2%{?dist}
+Release:        4%{?dist}
 Summary:        risiOS's fork of webapp-manager
 
 License:        GPL v3
@@ -49,7 +49,7 @@ cp -a %{SOURCE1} %{buildroot}%{python3_sitelib}/webstream.py
 %{_datadir}/applications/org.x.webapp-manager.desktop
 %{_datadir}/desktop-directories/webapps-webapps.directory
 %{_datadir}/glib-2.0/schemas/org.x.webapp-manager.gschema.xml
-%{_datadir}/icons/hicolor/scalable/apps/webapp-default.svg
+%{_datadir}/icons/hicolor/scalable/apps/default-webapp.svg
 %{_datadir}/icons/hicolor/scalable/apps/webapp-manager.svg
 %{_datadir}/icons/hicolor/scalable/categories/applications-webapps.svg
 %{_datadir}/webapp-manager
