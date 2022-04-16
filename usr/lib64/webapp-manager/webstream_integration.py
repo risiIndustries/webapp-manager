@@ -173,9 +173,12 @@ class StoreWindow:
         app_widget.show_all()
 
 
-class Search(Gtk.ListBox):
+class Search(Gtk.ScrolledWindow):
     def __init__(self, app_store, main_window):
-        Gtk.ListBox.__init__(self)
+        Gtk.ScrolledWindow.__init__(self)
+        self.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+        self.listbox = Gtk.ListBox()
+        self.add(self.listbox)
         self.app_store = app_store
         self.main_window = main_window
         self.set_valign(Gtk.Align.FILL)
@@ -184,7 +187,7 @@ class Search(Gtk.ListBox):
         search_label.set_margin_top(10)
         search_label.set_markup("<b>Please enter search query</b>")
         search_label.set_margin_bottom(10)
-        self.add(search_label)
+        self.listbox.add(search_label)
         self.show_all()
 
     def search(self, query):
@@ -192,19 +195,19 @@ class Search(Gtk.ListBox):
         if len(query) > 2:
             for app in self.app_store.get_apps_by_search(query):
                 app.main_category = app.categories[0]
-                self.add(ListboxApp(app, self.main_window))
-            check_no_apps(self, "No apps found")
+                self.listbox.add(ListboxApp(app, self.main_window))
+            check_no_apps(self.listbox, "No apps found.")
         else:
             search_label = Gtk.Label()
             search_label.set_margin_top(10)
             search_label.set_markup("<b>Please enter search query</b>")
             search_label.set_margin_bottom(10)
-            self.add(search_label)
+            self.listbox.add(search_label)
 
-        self.show_all()
+        self.listbox.show_all()
 
     def reset(self):
-        for child in self.get_children():
+        for child in self.listbox.get_children():
             child.destroy()
 
 
