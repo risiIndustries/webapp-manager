@@ -31,23 +31,10 @@ class ListboxApp(Gtk.Box):
         self.app = app
         self.main_window = main_window
         self.cancellable = Gio.Cancellable()
+        self.pixbuf = Gtk.IconTheme().load_icon("webapp-default", 64, Gtk.IconLookupFlags.FORCE_SIZE)
 
-        self.image = Gtk.Image.new_from_icon_name(
-            "webapp-default", 64
-        )
-
-        self.pixbuf = pixbuf_from_url(
-            icons_url.format(app.appid)
-        )
-
-        if not self.pixbuf:
-            self.pixbuf = None
-        else:
-            self.pixbuf = self.pixbuf.scale_simple(64, 64, GdkPixbuf.InterpType.BILINEAR)
-        if self.pixbuf:
-            image.set_from_pixbuf(
-                self.pixbuf
-            )
+        self.image = Gtk.Image()
+        self.image.set_from_pixbuf(self.pixbuf)
 
         nameAndTagBox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         mainLabel = Gtk.Label()
