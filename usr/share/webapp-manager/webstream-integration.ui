@@ -2,24 +2,6 @@
 <!-- Generated with glade 3.38.2 -->
 <interface>
   <requires lib="gtk+" version="3.24"/>
-  <object class="GtkScrolledWindow">
-    <property name="visible">True</property>
-    <property name="can-focus">True</property>
-    <property name="hscrollbar-policy">never</property>
-    <property name="shadow-type">in</property>
-    <child>
-      <object class="GtkViewport">
-        <property name="visible">True</property>
-        <property name="can-focus">False</property>
-        <child>
-          <object class="GtkListBox">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-          </object>
-        </child>
-      </object>
-    </child>
-  </object>
   <object class="GtkApplicationWindow" id="storeWindow">
     <property name="can-focus">False</property>
     <child>
