@@ -1,6 +1,6 @@
 Name:           webapp-manager
-Version:        1.1.9
-Release:        6%{?dist}
+Version:        1.1.10
+Release:        7%{?dist}
 Summary:        risiOS's fork of webapp-manager
 
 License:        GPL v3
