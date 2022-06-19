@@ -179,10 +179,13 @@ class WebAppManager():
                 # Firefox based
                 firefox_profiles_dir = FIREFOX_PROFILES_DIR if browser.browser_type == BROWSER_TYPE_FIREFOX else FIREFOX_FLATPAK_PROFILES_DIR
                 firefox_profile_path = os.path.join(firefox_profiles_dir, codename)
-                exec_string = ("Exec=sh -c 'XAPP_FORCE_GTKWINDOW_ICON=" + icon + " " + browser.exec_path +
-                                    " --class WebApp-" + codename +
-                                    " --profile " + firefox_profile_path +
-                                    " --no-remote ")
+                exec_string = (
+                    "Exec=sh -c 'XAPP_FORCE_GTKWINDOW_ICON=" + icon +
+                    " MOZ_DISABLE_WAYLAND=1 " + browser.exec_path +
+                    " --class WebApp-" + codename +
+                    " --profile " + firefox_profile_path +
+                    " --no-remote "
+                )
                 if privatewindow:
                     exec_string += "--private-window "
                 desktop_file.write(exec_string + url + "'\n")
@@ -206,11 +209,13 @@ class WebAppManager():
                     profile_path = os.path.join(PROFILES_DIR, codename)
                     exec_string = ("Exec=" + browser.exec_path +
                                         " --app=" + url +
+                                        " --ozone-platform=x11" +
                                         " --class=WebApp-" + codename +
                                         " --user-data-dir=" + profile_path)
                 else:
                     exec_string = ("Exec=" + browser.exec_path +
                                         " --app=" + url +
+                                        " --ozone-platform=x11" +
                                         " --class=WebApp-" + codename)
 
                 if privatewindow:
