@@ -1,5 +1,5 @@
 Name:           webapp-manager
-Version:        1.1.10
+Version:        1.1.11
 Release:        7%{?dist}
 Summary:        risiOS's fork of webapp-manager
 
