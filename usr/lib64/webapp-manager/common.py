@@ -134,19 +134,22 @@ class WebAppManager():
         browsers = []
         # type, name, exec, test
         browsers.append(Browser(BROWSER_TYPE_FIREFOX, "Firefox", "firefox", "/usr/bin/firefox"))
-        browsers.append(Browser(BROWSER_TYPE_FIREFOX, "Firefox Extended Support Release", "firefox-esr", "/usr/bin/firefox-esr"))
         browsers.append(Browser(BROWSER_TYPE_FIREFOX, "Firefox Developer Edition", "firefox-developer-edition", "/usr/bin/firefox-developer-edition"))
+        browsers.append(Browser(BROWSER_TYPE_FIREFOX, "Firefox Extended Support Release", "firefox-esr", "/usr/bin/firefox-esr"))
         browsers.append(Browser(BROWSER_TYPE_FIREFOX_FLATPAK, "Firefox (Flatpak)", "/var/lib/flatpak/exports/bin/org.mozilla.firefox", "/var/lib/flatpak/exports/bin/org.mozilla.firefox"))
-        browsers.append(Browser(BROWSER_TYPE_CHROMIUM, "Brave", "brave-browser", "/usr/bin/brave-browser"))
-        browsers.append(Browser(BROWSER_TYPE_CHROMIUM, "Chrome", "google-chrome", "/usr/bin/google-chrome-stable"))
+        browsers.append(Browser(BROWSER_TYPE_CHROMIUM, "Brave", "brave", "/usr/bin/brave"))
+        browsers.append(Browser(BROWSER_TYPE_CHROMIUM, "Chrome", "google-chrome-stable", "/usr/bin/google-chrome-stable"))
         browsers.append(Browser(BROWSER_TYPE_CHROMIUM, "Chromium", "chromium", "/usr/bin/chromium"))
         browsers.append(Browser(BROWSER_TYPE_CHROMIUM, "Chromium Freeworld", "chromium-freeworld", "/usr/bin/chromium-freeworld"))
         browsers.append(Browser(BROWSER_TYPE_CHROMIUM, "Chromium (chromium-browser)", "chromium-browser", "/usr/bin/chromium-browser"))
         browsers.append(Browser(BROWSER_TYPE_CHROMIUM, "Chromium (Snap)", "chromium", "/snap/bin/chromium"))
-        browsers.append(Browser(BROWSER_TYPE_EPIPHANY, "Epiphany", "epiphany", "/usr/bin/epiphany-browser"))
-        browsers.append(Browser(BROWSER_TYPE_CHROMIUM, "Vivaldi", "vivaldi", "/usr/bin/vivaldi-stable"))
+        browsers.append(Browser(BROWSER_TYPE_EPIPHANY, "Epiphany", "epiphany", "/usr/bin/epiphany"))
+        browsers.append(Browser(BROWSER_TYPE_FIREFOX,  "LibreWolf", "librewolf", "/usr/bin/librewolf"))
+        browsers.append(Browser(BROWSER_TYPE_CHROMIUM, "Vivaldi", "vivaldi-stable", "/usr/bin/vivaldi-stable"))
         browsers.append(Browser(BROWSER_TYPE_CHROMIUM, "Vivaldi Snapshot", "vivaldi-snapshot", "/usr/bin/vivaldi-snapshot"))
-        browsers.append(Browser(BROWSER_TYPE_CHROMIUM, "Microsoft Edge", "microsoft-edge", "/usr/bin/microsoft-edge"))
+        browsers.append(Browser(BROWSER_TYPE_CHROMIUM, "Microsoft Edge", "microsoft-edge-stable", "/usr/bin/microsoft-edge-stable"))
+        browsers.append(Browser(BROWSER_TYPE_CHROMIUM, "Microsoft Edge Beta", "microsoft-edge-beta", "/usr/bin/microsoft-edge-beta"))
+        browsers.append(Browser(BROWSER_TYPE_CHROMIUM, "Microsoft Edge Dev", "microsoft-edge-dev", "/usr/bin/microsoft-edge-dev"))
         browsers.append(Browser(BROWSER_TYPE_CHROMIUM, "Ungoogled Chromium (Flatpak)", "/var/lib/flatpak/exports/bin/com.github.Eloston.UngoogledChromium", "/var/lib/flatpak/exports/bin/com.github.Eloston.UngoogledChromium"))
         browsers.append(Browser(BROWSER_TYPE_CHROMIUM, "Chromium (Flatpak)", "/var/lib/flatpak/exports/bin/org.chromium.Chromium", "/var/lib/flatpak/exports/bin/org.chromium.Chromium"))
         browsers.append(Browser(BROWSER_TYPE_FALKON, "Falkon", "falkon", "/usr/bin/falkon"))
@@ -220,6 +223,10 @@ class WebAppManager():
 
                 if privatewindow:
                     if browser.name == "Microsoft Edge":
+                        exec_string += " --inprivate"
+                    elif browser.name == "Microsoft Edge Beta":
+                        exec_string += " --inprivate"
+                    elif browser.name == "Microsoft Edge Dev":
                         exec_string += " --inprivate"
                     else:
                         exec_string += " --incognito"
@@ -324,6 +331,32 @@ def download_image(root_url, link):
 
 import tempfile
 
+def _find_link_favicon(soup, iconformat):
+    items = soup.find_all("link", {"rel": iconformat})
+    for item in items:
+        link = item.get("href")
+        if link:
+            yield link
+
+def _find_meta_content(soup, iconformat):
+    item = soup.find("meta", {"name": iconformat})
+    if not item:
+        return
+    link = item.get("content")
+    if link:
+        yield link
+
+def _find_property(soup, iconformat):
+    items = soup.find_all("meta", {"property": iconformat})
+    for item in items:
+        link = item.get("content")
+        if link:
+            yield link
+
+def _find_url(_soup, iconformat):
+    yield iconformat
+
+
 def download_favicon(url):
     images = []
     url = normalize_url(url)
@@ -342,43 +375,39 @@ def download_favicon(url):
                     t = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
                     images.append(["Favicon Grabber", image, t.name])
                     image.save(t.name)
-        images = sorted(images, key = lambda x: (x[1].height), reverse=True)
-        return images
+            images = sorted(images, key = lambda x: (x[1].height), reverse=True)
+            if images:
+                return images
     except Exception as e:
         print(e)
 
     # Fallback: Check HTML and /favicon.ico
     try:
         response = requests.get(url, timeout=3)
-        if response != None:
+        if response.ok:
             import bs4
             soup = bs4.BeautifulSoup(response.content, "html.parser")
 
+            iconformats = [
+                ("apple-touch-icon", _find_link_favicon),
+                ("shortcut icon", _find_link_favicon),
+                ("icon", _find_link_favicon),
+                ("msapplication-TileImage", _find_meta_content),
+                ("msapplication-square310x310logo", _find_meta_content),
+                ("msapplication-square150x150logo", _find_meta_content),
+                ("msapplication-square70x70logo", _find_meta_content),
+                ("og:image", _find_property),
+                ("favicon.ico", _find_url),
+            ]
+
             # icons defined in the HTML
-            for iconformat in ["apple-touch-icon", "shortcut icon", "icon", "msapplication-TileImage"]:
-                item = soup.find("link", {"rel": iconformat})
-                if item != None:
-                    image = download_image(root_url, item["href"])
-                    if image != None:
+            for (iconformat, getter) in iconformats:
+                for link in getter(soup, iconformat):
+                    image = download_image(root_url, link)
+                    if image is not None:
                         t = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
                         images.append([iconformat, image, t.name])
                         image.save(t.name)
-
-            # favicon.ico
-            image = download_image(root_url, "/favicon.ico")
-            if image != None:
-                t = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
-                images.append(["favicon", image, t.name])
-                image.save(t.name)
-
-            # OG:IMAGE
-            item = soup.find("meta", {"property": "og:image"})
-            if item != None:
-                image = download_image(root_url, item['content'])
-                if image != None:
-                    t = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
-                    images.append(["og:image", image, t.name])
-                    image.save(t.name)
 
     except Exception as e:
         print(e)
