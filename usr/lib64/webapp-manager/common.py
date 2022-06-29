@@ -137,7 +137,7 @@ class WebAppManager():
         browsers.append(Browser(BROWSER_TYPE_FIREFOX, "Firefox Developer Edition", "firefox-developer-edition", "/usr/bin/firefox-developer-edition"))
         browsers.append(Browser(BROWSER_TYPE_FIREFOX, "Firefox Extended Support Release", "firefox-esr", "/usr/bin/firefox-esr"))
         browsers.append(Browser(BROWSER_TYPE_FIREFOX_FLATPAK, "Firefox (Flatpak)", "/var/lib/flatpak/exports/bin/org.mozilla.firefox", "/var/lib/flatpak/exports/bin/org.mozilla.firefox"))
-        browsers.append(Browser(BROWSER_TYPE_CHROMIUM, "Brave", "brave", "/usr/bin/brave"))
+        browsers.append(Browser(BROWSER_TYPE_CHROMIUM, "Brave", "brave", "/usr/bin/brave-browser-stable"))
         browsers.append(Browser(BROWSER_TYPE_CHROMIUM, "Chrome", "google-chrome-stable", "/usr/bin/google-chrome-stable"))
         browsers.append(Browser(BROWSER_TYPE_CHROMIUM, "Chromium", "chromium", "/usr/bin/chromium"))
         browsers.append(Browser(BROWSER_TYPE_CHROMIUM, "Chromium Freeworld", "chromium-freeworld", "/usr/bin/chromium-freeworld"))
@@ -222,11 +222,7 @@ class WebAppManager():
                                         " --class=WebApp-" + codename)
 
                 if privatewindow:
-                    if browser.name == "Microsoft Edge":
-                        exec_string += " --inprivate"
-                    elif browser.name == "Microsoft Edge Beta":
-                        exec_string += " --inprivate"
-                    elif browser.name == "Microsoft Edge Dev":
+                    if browser.name in ["Microsoft Edge", "Microsoft Edge Beta", "Microsoft Edge Dev"]:
                         exec_string += " --inprivate"
                     else:
                         exec_string += " --incognito"

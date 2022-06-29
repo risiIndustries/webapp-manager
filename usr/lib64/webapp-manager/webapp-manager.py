@@ -387,7 +387,7 @@ class WebAppManagerWindow():
         self.headerbar.set_subtitle(_("Add a New Web App"))
 
     def on_favicon_button(self, widget):
-        url = self.get_url()
+        url = self.get_favicon_url()
         self.spinner.start()
         self.spinner.show()
         self.favicon_stack.set_visible_child_name("page_spinner")
@@ -403,7 +403,7 @@ class WebAppManagerWindow():
             url = "https://%s" % url
         return url
 
-    def get_url(self):
+    def get_favicon_url(self):
         url = self.url_entry.get_text().strip().replace(
             "https://redirect.risi.io/?url=", ""
         ).replace(
@@ -486,7 +486,7 @@ class WebAppManagerWindow():
             widget.get_text().startswith("https://redirect.risi.io/?url=") or
             widget.get_text().startswith("redirect.risi.io/?url=")
         )
-        if self.get_url() != "":
+        if self.get_favicon_url() != "":
             self.favicon_button.set_sensitive(True)
         else:
             self.favicon_button.set_sensitive(False)
@@ -500,7 +500,7 @@ class WebAppManagerWindow():
             self.ok_button.set_sensitive(True)
 
     def guess_icon(self):
-        url = self.get_url().lower()
+        url = self.get_favicon_url().lower()
         if url != "":
             info = tldextract.extract(url)
             icon = None
